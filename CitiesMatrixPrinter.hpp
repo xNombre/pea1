@@ -1,10 +1,8 @@
 #pragma once
 
-#include "ListGraph.hpp"
+#include "CitiesMatrix.hpp"
 
 class CitiesMatrixPrinter {
 public:
-    static void print(const ListGraph &graph);
-
-    
+    static void print(const CitiesMatrix &graph);
 };

@@ -1,10 +1,11 @@
 #include "CitiesMatrix.hpp"
 
 #include <stdexcept>
+#include <cstring>
 
 CitiesMatrix::CitiesMatrix(const size_t &cities_number)
+    : cities_number(cities_number)
 {
-    this->cities_number = cities_number;
     matrix = new int[cities_number * cities_number]();
 
     for (int i = 0; i < cities_number; i++) {
@@ -14,7 +15,27 @@ CitiesMatrix::CitiesMatrix(const size_t &cities_number)
 
 CitiesMatrix::~CitiesMatrix()
 {
-    delete[] matrix;
+        delete[] matrix;
+}
+
+CitiesMatrix::CitiesMatrix(CitiesMatrix &&other)
+{
+    cities_number = other.cities_number;
+    matrix = other.matrix;
+
+    other.matrix = nullptr;
+    other.cities_number = 0;
+}
+
+CitiesMatrix &CitiesMatrix::operator=(CitiesMatrix &&other)
+{
+    cities_number = other.cities_number;
+    matrix = other.matrix;
+
+    other.matrix = nullptr;
+    other.cities_number = 0;
+
+    return *this;
 }
 
 void CitiesMatrix::connect_cities(const size_t &from, const size_t &to, const size_t &weight)
@@ -47,6 +68,9 @@ bool CitiesMatrix::is_matrix_valid() const
 const int &CitiesMatrix::at(const size_t &from, const size_t &to) const
 {
 #ifdef DEBUG
+    if (!matrix)
+        throw std::runtime_error("Matix is null!");
+
     if (from >= cities_number || to >= cities_number)
         throw std::out_of_range("");
 #endif // DEBUG
@@ -57,6 +81,9 @@ const int &CitiesMatrix::at(const size_t &from, const size_t &to) const
 int &CitiesMatrix::at(const size_t &from, const size_t &to)
 {
 #ifdef DEBUG
+    if (!matrix)
+        throw std::runtime_error("Matix is null!");
+    
     if (from >= cities_number || to >= cities_number)
         throw std::out_of_range("");
 #endif // DEBUG

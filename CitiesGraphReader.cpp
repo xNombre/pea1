@@ -1,6 +1,11 @@
 #include "CitiesGraphReader.hpp"
 
-ListGraph CitiesGraphReader::readFromFile(const std::string &filename)
+#include <cassert>
+#include <stdexcept>
+
+#include <iostream>
+
+CitiesMatrix CitiesGraphReader::readFromFile(const std::string &filename)
 {
     auto fileStream = openFile(filename);
 
@@ -10,23 +15,22 @@ ListGraph CitiesGraphReader::readFromFile(const std::string &filename)
 	return readCostsMatrix(fileStream, numberOfCities);
 }
 
-std::ifstream openFile(const std::string &filename)
+std::ifstream CitiesGraphReader::openFile(const std::string &filename)
 {
     std::ifstream file(filename);
     if (file.is_open())
         return file;
 
-    throw new std::exception();
+    throw new std::invalid_argument("File not found: " + filename);
 }
 
-ListGraph readCostsMatrix(std::ifstream &fileStream, const size_t &numberOfCities)
+CitiesMatrix CitiesGraphReader::readCostsMatrix(std::ifstream &fileStream, const size_t &numberOfCities)
 {
-	ListGraph graph;
+	CitiesMatrix cities(numberOfCities);
 
 	for (size_t col = 0; col < numberOfCities; col++) {
 		for (size_t row = 0; row < numberOfCities; row++) {
 			int weight;
-
 			fileStream >> weight;
 
 #ifdef DEBUG
@@ -34,11 +38,14 @@ ListGraph readCostsMatrix(std::ifstream &fileStream, const size_t &numberOfCitie
 				assert(weight == -1);
 			}
 #endif
-			if (weight == -1) {
+			if (weight < 1) {
 				continue;
 			}
+			std::cout << col << " " << row << " " << weight << std::endl;
 
-			graph.addEdge(col, row, weight);
+			cities.connect_cities(col, row, weight);
 		}
 	}
+
+	return cities;
 }

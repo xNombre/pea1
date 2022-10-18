@@ -2,10 +2,10 @@
 
 #include "Array.hpp"
 
-template <typename T>
 class ArrayPrinter {
 public:
+    template <typename T>
     static void print(const Array<T> &array);
 };
 
-#include "ArrayPrinter.cpp"
+//#include "ArrayPrinter.cpp"

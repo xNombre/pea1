@@ -3,7 +3,7 @@
 #include <iostream>
 
 template<typename T>
-void ArrayPrinter<T>::print(const Array<T>& array)
+void ArrayPrinter::print(const Array<T>& array)
 {
     if (array.empty())
         return;

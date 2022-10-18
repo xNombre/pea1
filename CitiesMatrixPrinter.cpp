@@ -4,41 +4,44 @@
 
 using namespace std;
 
-void separateWithSpaces(int number, size_t spaces)
+#define RST  "\x1B[0m"
+#define KRED  "\x1B[41m"
+#define KBLU  "\x1B[44m"
+
+void CitiesMatrixPrinter::print(const CitiesMatrix &graph)
 {
-    size_t digits = 0;
-    if (number < 0)
-        digits++;
+    const auto &count = graph.get_cities_number();
+    const auto &vertices = graph.get_cities_number();
 
-    while (number > 0) {
-        digits++;
-        number %= 10;
+    if (vertices == 0) {
+        std::cout << KRED << "Graf jest pusty!" << RST << std::endl;
+        return;
     }
 
-    for (size_t i = 0; i < spaces - digits; i++) {
-        cout << " ";
-    }
-}
+    std::cout << "   " << KRED;
+    for (size_t j = 0; j < count; j++) {
+        std::cout << j << "  ";
 
-void CitiesMatrixPrinter::print(const ListGraph &graph)
-{
-    const auto &cities = graph.getVertexCount();
-    for (size_t city = 0; city < cities; city++) {
-        cout << city << " ";
-        separateWithSpaces(city, 2);
+        if (j < 10)
+            std::cout << " ";
     }
-    cout << endl;
+    std::cout << RST << std::endl;
 
-    for (size_t city = 0; city < cities; city++) {
-        cout << "---";
-    }
-    cout << endl;
-    
-    for (size_t city = 0; city < cities; city++) {
-        cout << city;
-        separateWithSpaces(city, 2);
-        cout << " | ";
+    for (size_t i = 0; i < vertices; i++) {
+        std::cout << KBLU << i << RST << " ";
+        if (i < 10)
+            std::cout << " ";
 
-        
+        for (size_t j = 0; j < count; j++) {
+            std::cout << graph.at(i, j) << " ";
+
+            if (graph.at(i, j) < 10 && graph.at(i, j) > -1)
+                std::cout << "  ";
+            else if (graph.at(i, j) > -10)
+                std::cout << " ";
+        }
+        std::cout << std::endl;
     }
+
+    std::cout << std::endl;
 }
