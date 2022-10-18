@@ -7,17 +7,6 @@
 using std::size_t;
 
 template <typename T>
-<<<<<<< HEAD
-=======
-void Array<T>::clear()
-{
-    if (array_size == 0)
-        return;
-    std::fill(array, array + array_size, 0);
-}
-
-template <typename T>
->>>>>>> 70f71ad8d11f65f45e1751cb70f57a76407f9588
 Array<T>::Array(const size_t &size) : array_size(size)
 {
     if (size == 0)
@@ -80,7 +69,6 @@ const T &Array<T>::operator[](const size_t &at) const
 }
 
 template <typename T>
-<<<<<<< HEAD
 void Array<T>::clear()
 {
     if (array_size == 0)
@@ -89,8 +77,6 @@ void Array<T>::clear()
 }
 
 template <typename T>
-=======
->>>>>>> 70f71ad8d11f65f45e1751cb70f57a76407f9588
 void Array<T>::resize(const size_t &size)
 {
     if (size == 0) {

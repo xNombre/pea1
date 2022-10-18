@@ -1,5 +1,7 @@
 #include <iostream>
 
+#define DEBUG
+
 #include "Array.hpp"
 #include "ArrayPrinter.hpp"
 
