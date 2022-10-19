@@ -4,6 +4,7 @@
 
 #include "CitiesGraphReader.hpp"
 #include "CitiesMatrixPrinter.hpp"
+#include "BruteForceTSP.hpp"
 
 using namespace std;
 
@@ -32,7 +33,7 @@ char getOptionFromUser()
     return input;
 }
 
-int menu()
+void menu()
 {
     CitiesMatrix graph;
     while (1) {
@@ -59,8 +60,11 @@ int menu()
         case 'x':
             CitiesMatrixPrinter::print(graph);
             break;
+        case 'b': {
+            BruteForceTSP alg = BruteForceTSP(graph);
+            std::cout << alg.solve().total_weight << std::endl;
+            return;
+        }
         }
     }
-
-    return 0;
 }

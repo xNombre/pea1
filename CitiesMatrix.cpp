@@ -1,7 +1,6 @@
 #include "CitiesMatrix.hpp"
 
 #include <stdexcept>
-#include <cstring>
 
 CitiesMatrix::CitiesMatrix(const size_t &cities_number)
     : cities_number(cities_number)

@@ -55,16 +55,20 @@ Array<T>::~Array()
 template <typename T>
 T &Array<T>::operator[](const size_t &at)
 {
+#ifdef DEBUG
     if (at >= array_size)
         throw std::out_of_range("Array index out of range");
+#endif //DEBUG
     return array[at];
 }
 
 template <typename T>
 const T &Array<T>::operator[](const size_t &at) const
 {
+#ifdef DEBUG
     if (at >= array_size)
         throw std::out_of_range("Array index out of range");
+#endif //DEBUG
     return array[at];
 }
 

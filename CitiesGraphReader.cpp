@@ -3,8 +3,6 @@
 #include <cassert>
 #include <stdexcept>
 
-#include <iostream>
-
 CitiesMatrix CitiesGraphReader::readFromFile(const std::string &filename)
 {
     auto fileStream = openFile(filename);
@@ -41,7 +39,6 @@ CitiesMatrix CitiesGraphReader::readCostsMatrix(std::ifstream &fileStream, const
 			if (weight < 1) {
 				continue;
 			}
-			std::cout << col << " " << row << " " << weight << std::endl;
 
 			cities.connect_cities(col, row, weight);
 		}
