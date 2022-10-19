@@ -5,7 +5,7 @@ QuickPermArray::QuickPermArray(const size_t &cities_count)
       iteration_state(cities_count + 1)
 {
     for (size_t i = 0; i < cities_count; i++) {
-        permutation_array[i] = i;
+        permutation_array[i] = i + 1;
         iteration_state[i] = i;
     }
     iteration_state[cities_count] = cities_count;
