@@ -44,3 +44,8 @@ bool QuickPermArray::next_permutation()
 
     return true;
 }
+
+const Array<size_t> &QuickPermArray::get_array() const
+{
+    return permutation_array;
+}

@@ -14,7 +14,7 @@ CitiesMatrix::CitiesMatrix(const size_t &cities_number)
 
 CitiesMatrix::~CitiesMatrix()
 {
-        delete[] matrix;
+    delete[] matrix;
 }
 
 CitiesMatrix::CitiesMatrix(CitiesMatrix &&other)
@@ -28,6 +28,8 @@ CitiesMatrix::CitiesMatrix(CitiesMatrix &&other)
 
 CitiesMatrix &CitiesMatrix::operator=(CitiesMatrix &&other)
 {
+    delete[] matrix;
+    
     cities_number = other.cities_number;
     matrix = other.matrix;
 
@@ -39,6 +41,11 @@ CitiesMatrix &CitiesMatrix::operator=(CitiesMatrix &&other)
 
 void CitiesMatrix::connect_cities(const size_t &from, const size_t &to, const size_t &weight)
 {
+#ifdef DEBUG
+    if (from == to)
+        throw std::invalid_argument("");
+#endif // DEBUG
+
     at(from, to) = weight;
 }
 

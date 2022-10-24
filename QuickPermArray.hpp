@@ -6,7 +6,8 @@ class QuickPermArray {
 public:
     QuickPermArray(const size_t &cities_count);
     const size_t &operator[](const size_t &index) const;
-
+    const Array<size_t> &get_array() const;
+    
     // Returns false when there are no more permutations
     bool next_permutation();
 

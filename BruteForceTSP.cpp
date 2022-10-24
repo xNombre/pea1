@@ -23,6 +23,7 @@ TSPResult BruteForceTSP::solve()
 
         if (min > cur_weight) {
             min = cur_weight;
+            result.path = perm.get_array();
         }
     } while (perm.next_permutation());
 

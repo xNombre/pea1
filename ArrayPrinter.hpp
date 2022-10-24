@@ -1,11 +1,20 @@
 #pragma once
 
+#include <iostream>
+
 #include "Array.hpp"
 
 class ArrayPrinter {
 public:
     template <typename T>
-    static void print(const Array<T> &array);
-};
+    static void print(const Array<T> &array)
+    {
+        if (array.empty())
+            return;
 
-//#include "ArrayPrinter.cpp"
+        for (size_t i = 0; i < array.size(); i++) {
+            std::cout << array[i] << " ";
+        }
+        std::cout << std::endl;
+    }
+};

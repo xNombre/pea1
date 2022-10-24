@@ -5,6 +5,11 @@
 #include "CitiesGraphReader.hpp"
 #include "CitiesMatrixPrinter.hpp"
 #include "BruteForceTSP.hpp"
+#include "ArrayPrinter.hpp"
+#include "BranchnBound.hpp"
+#include "RandomGraphGen.hpp"
+#include "DynamicTSP.hpp"
+#include "TimeBench.hpp"
 
 using namespace std;
 
@@ -33,6 +38,12 @@ char getOptionFromUser()
     return input;
 }
 
+void print_result(const TSPResult& result)
+{
+    std::cout << result.total_weight << std::endl;
+    ArrayPrinter::print(result.path);
+}
+
 void menu()
 {
     CitiesMatrix graph;
@@ -43,27 +54,48 @@ void menu()
             << "r - losowa generacja\n"
             << "x - wyswietl graf\n"
             << "b - brute-force\n"
-            << "a - branch&bount\n"
-            << "x - \n";
+            << "a - branch&bound (little)\n"
+            << "d - dynamic\n"
+            << "s - benchmark\n"
+            << "e - wyjscie\n";
         input = getOptionFromUser();
 
-
         switch (input) {
-        case 'r':
+        case 'r': {
+            auto size = getDataFromUser();
+            graph = RandomGraphGen::generate(size);
             break;
+        }
         case 'f': {
             string file;
             cin >> file;
             graph = CitiesGraphReader::readFromFile(file);
             break;
         }
-        case 'x':
+        case 'x': {
             CitiesMatrixPrinter::print(graph);
             break;
+        }
         case 'b': {
-            BruteForceTSP alg = BruteForceTSP(graph);
-            std::cout << alg.solve().total_weight << std::endl;
+            TSPAlgorithm *alg = new BruteForceTSP(graph);
+            print_result(alg->solve());
+            break;
+        }
+        case 'a': {
+            TSPAlgorithm *alg = new BranchnBound(graph);
+            print_result(alg->solve());
+            break;
+        }
+        case 'd': {
+            TSPAlgorithm *alg = new DynamicTSP(graph);
+            print_result(alg->solve());
+            break;
+        }
+        case 'e': {
             return;
+        }
+        case 's': {
+            break;
         }
         }
     }
