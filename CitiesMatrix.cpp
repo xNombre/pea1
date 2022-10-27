@@ -39,6 +39,14 @@ CitiesMatrix &CitiesMatrix::operator=(CitiesMatrix &&other)
     return *this;
 }
 
+CitiesMatrix::CitiesMatrix(const CitiesMatrix &other)
+{
+    matrix = new int[cities_number * cities_number]();
+    std::copy(other.matrix, other.matrix + sizeof(int) * cities_number * cities_number, matrix);
+
+    cities_number = other.cities_number;
+}
+
 void CitiesMatrix::connect_cities(const size_t &from, const size_t &to, const size_t &weight)
 {
 #ifdef DEBUG
