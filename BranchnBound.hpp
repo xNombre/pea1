@@ -4,6 +4,7 @@
 #include <queue>
 #include <stack>
 
+#include "Array.h"
 #include "TSPAlgorithm.hpp"
 
 class BranchnBound : public TSPAlgorithm {
@@ -16,17 +17,15 @@ public:
     TSPResult solve() override;
 
 private:
-    //typedef std::vector<std::vector<size_t>> matrix_t;
     typedef CitiesMatrix matrix_t;
     typedef std::pair<size_t, matrix_t> reduce_result;
-    const size_t& inf = SIZE_MAX;
 
     reduce_result minimize_matrix(matrix_t matrix);
     matrix_t mask_parent_and_current(matrix_t matrix, size_t from, size_t to);
 
     struct Node {
         size_t total_weight = 0;
-        std::vector<size_t> path;
+        Array<size_t> path;
         matrix_t matrix;
         size_t city;
         size_t cities_left;
@@ -43,14 +42,11 @@ private:
             total_weight += weight;
             cities_left--;
         }
-        
+
+        // Reverse comparison operators to prioritize cheaper weights
         bool operator>(const Node &other) const
         {
             return total_weight < other.total_weight;
-        }
-        bool operator==(const Node &other) const
-        {
-            return total_weight == other.total_weight;
         }
         bool operator<(const Node &other) const
         {

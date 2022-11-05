@@ -1,9 +1,12 @@
 #pragma once
 
 #include <stddef.h>
+#include <stdint.h>
 
 class CitiesMatrix {
 public:
+    const int unreachable_val = SIZE_MAX;
+    
     CitiesMatrix(const size_t &cities_number);
     CitiesMatrix() = default;
     ~CitiesMatrix();

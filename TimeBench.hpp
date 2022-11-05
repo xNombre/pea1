@@ -28,12 +28,11 @@ private:
     void benchmark_function();
     void watchdog_function(const timeout_t &timeout);
 
+    FutureResult<ReturnType> task_result;
     std::promise<result_t> task_promise;
-    //std::future<result_t> task_future;
     std::thread task_thread, watchdog_thread;
     std::thread::native_handle_type native_handle;
     std::mutex task_result_mutex;
-    bool task_finished_gracefully = true;
     task_function_t task_function;
     std::condition_variable watchdog_timeout;
 };

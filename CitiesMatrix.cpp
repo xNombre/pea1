@@ -5,8 +5,12 @@
 CitiesMatrix::CitiesMatrix(const size_t &cities_number)
     : cities_number(cities_number)
 {
+#ifdef DEBUG
     matrix = new int[cities_number * cities_number]();
-
+#else
+    matrix = new int[cities_number * cities_number];
+#endif // DEBUG
+    
     for (int i = 0; i < cities_number; i++) {
         at(i, i) = -1;
     }
@@ -41,7 +45,12 @@ CitiesMatrix &CitiesMatrix::operator=(CitiesMatrix &&other)
 
 CitiesMatrix::CitiesMatrix(const CitiesMatrix &other)
 {
+#ifdef DEBUG
     matrix = new int[cities_number * cities_number]();
+#else
+    matrix = new int[cities_number * cities_number];
+#endif // DEBUG
+
     std::copy(other.matrix, other.matrix + sizeof(int) * cities_number * cities_number, matrix);
 
     cities_number = other.cities_number;
@@ -79,7 +88,7 @@ bool CitiesMatrix::is_matrix_valid() const
     return true;
 }
 
-const int &CitiesMatrix::at(const size_t &from, const size_t &to) const
+const int &CitiesMatrix::at(const size_t& from, const size_t &to) const
 {
 #ifdef DEBUG
     if (!matrix)
