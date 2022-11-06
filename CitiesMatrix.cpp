@@ -50,14 +50,12 @@ CitiesMatrix &CitiesMatrix::operator=(CitiesMatrix &&other)
 
 CitiesMatrix::CitiesMatrix(const CitiesMatrix &other)
 {
-    if (other.cities_number < 1)
-        return;
     cities_number = other.cities_number;
 
 #ifdef DEBUG
     matrix = new weight_t[cities_number * cities_number]();
 #else
-    matrix = new weight_t[cities_number * cities_number]();
+    matrix = new weight_t[cities_number * cities_number];
 #endif // DEBUG
 
     std::copy(other.matrix, other.matrix + cities_number * cities_number, matrix);

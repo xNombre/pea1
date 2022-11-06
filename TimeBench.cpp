@@ -3,7 +3,7 @@
 #include <pthread.h>
 
 template <typename ReturnType>
-TimeBench<ReturnType>::TimeBench(task_function_t &fun)
+TimeBench<ReturnType>::TimeBench(task_function_t fun)
     : task_function(fun)
 {
 }

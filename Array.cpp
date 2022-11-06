@@ -12,7 +12,11 @@ Array<T>::Array(const size_t &size) : array_size(size)
     if (size == 0)
         return;
 
+#ifdef DEBUG
     array = new T[size]();
+#else
+    array = new T[size];
+#endif // DEBUG
 }
 
 template <typename T>
@@ -57,6 +61,8 @@ auto Array<T>::operator=(Array &&other) -> Array<T> &
     if (this == &other)
         return *this;
 
+    delete[] array;
+    
     array_size = other.array_size;
     array = other.array;
 
@@ -108,7 +114,11 @@ void Array<T>::resize(const size_t &size)
         array = nullptr;
     }
     else {
+#ifdef DEBUG
         T *new_array = new T[size]();
+#else
+        T *new_array = new T[size];
+#endif // DEBUG
 
         std::copy(array, array + std::min(array_size, size), new_array);
 

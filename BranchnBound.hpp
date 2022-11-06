@@ -16,9 +16,9 @@ public:
 
     TSPResult solve() override;
 
+    ~BranchnBound() = default;
 private:
     typedef CitiesMatrix matrix_t;
-    //typedef std::pair<size_t, matrix_t> reduce_result;
     struct Node;
 
     size_t minimize_matrix(matrix_t &matrix);

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <memory>
 
 #include "CitiesGraphReader.hpp"
 #include "CitiesMatrixPrinter.hpp"
@@ -10,6 +11,7 @@
 #include "RandomGraphGen.hpp"
 #include "DynamicTSP.hpp"
 #include "TimeBench.hpp"
+#include "TimeBench.cpp"
 
 using namespace std;
 
@@ -42,6 +44,18 @@ void print_result(const TSPResult& result)
 {
     std::cout << result.total_weight << std::endl;
     ArrayPrinter::print(result.path);
+}
+
+void solve_tsp(std::unique_ptr<TSPAlgorithm> alg)
+{
+    using namespace std::chrono_literals;
+    TimeBench<TSPResult> benchmark([&] { return alg->solve(); });
+    auto result_fut = benchmark.start_benchmark(5min);
+    auto result = result_fut.get();
+    print_result(result.result);
+    std::cout << "Finished in " <<
+        std::chrono::duration_cast<std::chrono::milliseconds>(result.measured_time).count()
+        << "ms" << std::endl;
 }
 
 void menu()
@@ -77,18 +91,15 @@ void menu()
             break;
         }
         case 'b': {
-            TSPAlgorithm *alg = new BruteForceTSP(graph);
-            print_result(alg->solve());
+            solve_tsp(std::make_unique<BruteForceTSP>(graph));
             break;
         }
         case 'a': {
-            TSPAlgorithm *alg = new BranchnBound(graph);
-            print_result(alg->solve());
+            solve_tsp(std::make_unique<BranchnBound>(graph));
             break;
         }
         case 'd': {
-            TSPAlgorithm *alg = new DynamicTSP(graph);
-            print_result(alg->solve());
+            solve_tsp(std::make_unique<DynamicTSP>(graph));
             break;
         }
         case 'e': {

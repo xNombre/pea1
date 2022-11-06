@@ -20,7 +20,7 @@ class TimeBench {
     typedef std::chrono::duration<double> timeout_t;
 
 public:
-    TimeBench(task_function_t &fun);
+    TimeBench(task_function_t fun);
     ~TimeBench();
     std::future<result_t> start_benchmark(const timeout_t &timeout);
 

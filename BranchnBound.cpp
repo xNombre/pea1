@@ -29,11 +29,6 @@ size_t BranchnBound::minimize_matrix(matrix_t& matrix)
                 
                 matrix.at(i, j) -= min_row;
 
-                /*if (min_col[j] == min_row)
-                    min_col[j] = 0;
-                else
-                    //min_col[j] -= min_row;
-                    min_col[j] -= min_row;*/
                 min_col[j] = std::min(min_col[j], matrix.at(i, j));
             }
         }
@@ -49,9 +44,6 @@ size_t BranchnBound::minimize_matrix(matrix_t& matrix)
                 
                 matrix.at(row, i) -= min_col[i];
             }
-            /*for (auto &j : matrix[i]) {
-                j -= min_col[i];
-            }*/
         }
     }
 
@@ -95,14 +87,13 @@ TSPResult BranchnBound::solve()
             continue;
 
         auto rslt = process_node(root_node, i);
-        queue.push(rslt);
+        queue.push(std::move(rslt));
 
         //CitiesMatrixPrinter::print(rslt.matrix);
         //std::cout << rslt.total_weight << std::endl;
     }
 
     while (!queue.empty()) {
-        // consider using pointer in queue
         auto cur = queue.top();
         queue.pop();
 
@@ -124,13 +115,13 @@ TSPResult BranchnBound::solve()
                 continue;
 
             auto rslt = process_node(cur, i);
-            queue.push(rslt);
+            queue.push(std::move(rslt));
 
+            
             //CitiesMatrixPrinter::print(rslt.matrix);
             //std::cout << rslt.total_weight << std::endl;
         }
     } 
 
     throw std::runtime_error("You should never end up in here");
-    //return result;
 }

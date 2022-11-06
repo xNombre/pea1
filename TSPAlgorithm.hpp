@@ -20,6 +20,7 @@ public:
     }
 
     virtual TSPResult solve() = 0;
+    virtual ~TSPAlgorithm() = default;
 
 protected:
     CitiesMatrix const *matrix;
