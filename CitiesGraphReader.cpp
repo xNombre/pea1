@@ -36,7 +36,7 @@ CitiesMatrix CitiesGraphReader::readCostsMatrix(std::ifstream &fileStream, const
 				assert(weight == -1);
 			}
 #endif
-			if (weight < 1) {
+			if (weight < 0) {
 				continue;
 			}
 

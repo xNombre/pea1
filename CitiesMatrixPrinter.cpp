@@ -7,6 +7,7 @@ using namespace std;
 #define RST  "\x1B[0m"
 #define KRED  "\x1B[41m"
 #define KBLU  "\x1B[44m"
+#define KMAG  "\x1B[35m"
 
 void CitiesMatrixPrinter::print(const CitiesMatrix &graph)
 {
@@ -39,7 +40,7 @@ void CitiesMatrixPrinter::print(const CitiesMatrix &graph)
         for (size_t j = 0; j < count; j++) {
             // Show unreachable as -1
             if (graph.at(i, j) == CitiesMatrix::unreachable_val) {
-                std::cout << "-1  ";
+                std::cout << KMAG << "INF " << RST;
                 continue;
             }
 

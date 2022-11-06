@@ -10,7 +10,7 @@ size_t BranchnBound::minimize_matrix(matrix_t& matrix)
     size_t reduce_factor = 0;
 
     for (size_t i = 0; i < matrix.get_cities_number(); i++) {
-        size_t min_row = CitiesMatrix::unreachable_val;
+        weight_t min_row = CitiesMatrix::unreachable_val;
         for (size_t j = 0; j < matrix.get_cities_number(); j++) {
             if (/*min_row != 0 &&*/ matrix.at(i, j) < min_row) {
                 min_row = matrix.at(i, j);
@@ -29,11 +29,12 @@ size_t BranchnBound::minimize_matrix(matrix_t& matrix)
                 
                 matrix.at(i, j) -= min_row;
 
-                if (min_col[j] == min_row)
+                /*if (min_col[j] == min_row)
                     min_col[j] = 0;
                 else
                     //min_col[j] -= min_row;
-                    min_col[j] -= min_row;
+                    min_col[j] -= min_row;*/
+                min_col[j] = std::min(min_col[j], matrix.at(i, j));
             }
         }
     }
@@ -85,15 +86,19 @@ TSPResult BranchnBound::solve()
     auto cost = minimize_matrix(minimized_matrix);
 
     Node root_node(matrix.get_cities_number(), 0);
+    root_node.matrix = std::move(minimized_matrix);
+    root_node.city = 0;
     root_node.total_weight = cost;
 
-    for (int i = 0; i < matrix.get_cities_number(); i++) {
+    for (int i = 1; i < matrix.get_cities_number(); i++) {
         if (matrix.at(0, i) == CitiesMatrix::unreachable_val)
             continue;
 
-        queue.push(process_node(root_node, i));
+        auto rslt = process_node(root_node, i);
+        queue.push(rslt);
 
-        CitiesMatrixPrinter::print(process_node(root_node, i).matrix);
+        //CitiesMatrixPrinter::print(rslt.matrix);
+        //std::cout << rslt.total_weight << std::endl;
     }
 
     while (!queue.empty()) {
@@ -118,7 +123,11 @@ TSPResult BranchnBound::solve()
             if (cur.matrix.at(cur.city, i) == CitiesMatrix::unreachable_val)
                 continue;
 
-            queue.push(process_node(cur, i));
+            auto rslt = process_node(cur, i);
+            queue.push(rslt);
+
+            //CitiesMatrixPrinter::print(rslt.matrix);
+            //std::cout << rslt.total_weight << std::endl;
         }
     } 
 

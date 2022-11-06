@@ -40,9 +40,29 @@ Array<T>::Array(const Array<T> &other)
 template <typename T>
 auto Array<T>::operator=(const Array<T> &other) -> Array<T> &
 {
+    if (this == &other)
+        return *this;
+
+    delete[] array;
+    
     array_size = other.array_size;
     array = new T[array_size];
     std::copy(other.array, other.array + array_size, array);
+    return *this;
+}
+
+template <typename T>
+auto Array<T>::operator=(Array &&other) -> Array<T> &
+{
+    if (this == &other)
+        return *this;
+
+    array_size = other.array_size;
+    array = other.array;
+
+    other.array = nullptr;
+    other.array_size = 0;
+
     return *this;
 }
 

@@ -34,6 +34,9 @@ CitiesMatrix::CitiesMatrix(CitiesMatrix &&other)
 
 CitiesMatrix &CitiesMatrix::operator=(CitiesMatrix &&other)
 {
+    if (this == &other)
+        return *this;
+
     delete[] matrix;
     
     cities_number = other.cities_number;
@@ -47,8 +50,10 @@ CitiesMatrix &CitiesMatrix::operator=(CitiesMatrix &&other)
 
 CitiesMatrix::CitiesMatrix(const CitiesMatrix &other)
 {
-    if (cities_number < 1)
+    if (other.cities_number < 1)
         return;
+    cities_number = other.cities_number;
+
 #ifdef DEBUG
     matrix = new weight_t[cities_number * cities_number]();
 #else
@@ -56,8 +61,6 @@ CitiesMatrix::CitiesMatrix(const CitiesMatrix &other)
 #endif // DEBUG
 
     std::copy(other.matrix, other.matrix + cities_number * cities_number, matrix);
-
-    cities_number = other.cities_number;
 }
 
 void CitiesMatrix::connect_cities(const size_t &from, const size_t &to, const size_t &weight)

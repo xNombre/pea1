@@ -13,11 +13,10 @@ public:
     CitiesMatrix() = default;
     ~CitiesMatrix();
     CitiesMatrix(CitiesMatrix &&);
-    //CitiesMatrix(CitiesMatrix &) = delete;
     CitiesMatrix(const CitiesMatrix &);
     CitiesMatrix &operator=(CitiesMatrix &&);
     CitiesMatrix &operator=(const CitiesMatrix &) = delete;
-
+    
     void connect_cities(const size_t &from, const size_t &to, const size_t &weight);
     void connect_cities_bidirectional(const size_t &from, const size_t &to, const size_t &weight);
 

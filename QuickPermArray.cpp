@@ -32,7 +32,7 @@ bool QuickPermArray::next_permutation()
 
     const size_t& j = (index % 2) * iteration_state[index];
 
-    const auto& tmp = permutation_array[j];
+    const auto tmp = permutation_array[j];
     permutation_array[j] = permutation_array[index];
     permutation_array[index] = tmp;
 
