@@ -4,36 +4,48 @@
 
 #include "CitiesMatrixPrinter.hpp"
 
-auto BranchnBound::minimize_matrix(matrix_t matrix) -> reduce_result
+size_t BranchnBound::minimize_matrix(matrix_t& matrix)
 {
-    std::vector<size_t> min_col(matrix.get_cities_number(), unreachable_val);
+    std::vector<size_t> min_col(matrix.get_cities_number(), CitiesMatrix::unreachable_val);
     size_t reduce_factor = 0;
 
     for (size_t i = 0; i < matrix.get_cities_number(); i++) {
-        size_t min_row = unreachable_val;
-        for (size_t j = 0; j < matrix.get_cities_number() /*&& min_row != 0*/; j++) {
-            if (matrix.at(i,j) < min_row) {
+        size_t min_row = CitiesMatrix::unreachable_val;
+        for (size_t j = 0; j < matrix.get_cities_number(); j++) {
+            if (/*min_row != 0 &&*/ matrix.at(i, j) < min_row) {
                 min_row = matrix.at(i, j);
             }
-            if (matrix.at(i, j) < min_col[j]) {
+            if (/*min_col[j] != 0 &&*/ matrix.at(i, j) < min_col[j]) {
                 min_col[j] = matrix.at(i, j);
             }
         }
         
-        if (min_row != 0 || min_row != unreachable_val) {
+        if (min_row != 0 && min_row != CitiesMatrix::unreachable_val) {
             reduce_factor += min_row;
             // minimize row
             for (size_t j = 0; j < matrix.get_cities_number(); j++) {
-                matrix.at(i,j) -= min_row;
+                if (matrix.at(i, j) == CitiesMatrix::unreachable_val)
+                    continue;
+                
+                matrix.at(i, j) -= min_row;
+
+                if (min_col[j] == min_row)
+                    min_col[j] = 0;
+                else
+                    //min_col[j] -= min_row;
+                    min_col[j] -= min_row;
             }
         }
     }
 
     // minimize columns
     for (size_t i = 0; i < min_col.size(); i++) {
-        if (min_col[i] != 0 || min_col[i] != unreachable_val) {
+        if (min_col[i] != 0 && min_col[i] != CitiesMatrix::unreachable_val) {
             reduce_factor += min_col[i];
             for (size_t row = 0; row < min_col.size(); row++) {
+                if (matrix.at(row, i) == CitiesMatrix::unreachable_val)
+                    continue;
+                
                 matrix.at(row, i) -= min_col[i];
             }
             /*for (auto &j : matrix[i]) {
@@ -42,49 +54,57 @@ auto BranchnBound::minimize_matrix(matrix_t matrix) -> reduce_result
         }
     }
 
-    return { reduce_factor, matrix };
+    return reduce_factor;
 }
 
-auto BranchnBound::mask_parent_and_current(matrix_t matrix, size_t from, size_t to) -> matrix_t
+void BranchnBound::mask_parent_and_current(matrix_t& matrix, size_t from, size_t to)
 {
     for (size_t i = 0; i < matrix.get_cities_number(); i++) {
-        matrix.at(from, i) = inf;
+        matrix.at(from, i) = CitiesMatrix::unreachable_val;
+        matrix.at(i, to) = CitiesMatrix::unreachable_val;
     }
-    for (size_t i = 0; i < matrix.get_cities_number(); i++) {
-        matrix.at(i, to) = inf;
-    }
-    matrix.at(to, from) = inf;
+    matrix.at(to, from) = CitiesMatrix::unreachable_val;
+}
 
-    return matrix;
+auto BranchnBound::process_node(Node parent, size_t to) -> Node
+{
+    parent.total_weight += parent.matrix.at(parent.city, to);
+    mask_parent_and_current(parent.matrix, parent.city, to);
+    parent.next_node(to, minimize_matrix(parent.matrix));
+
+    return parent;
 }
 
 TSPResult BranchnBound::solve()
 {
     TSPResult result;
-
     std::priority_queue<Node> queue;
-
     const auto &matrix = *this->matrix;
 
-    auto minimize_result = minimize_matrix(matrix);
-    auto &minimized_matrix = minimize_result.second;
-    auto &cost = minimize_result.first;
+    auto minimized_matrix = matrix;
+    auto cost = minimize_matrix(minimized_matrix);
+
+    Node root_node(matrix.get_cities_number(), 0);
+    root_node.total_weight = cost;
 
     for (int i = 0; i < matrix.get_cities_number(); i++) {
-        Node node(matrix.get_cities_number(), i);
-        node.next_node(0, matrix.at(0, i));
-        queue.push(node);
+        if (matrix.at(0, i) == CitiesMatrix::unreachable_val)
+            continue;
+
+        queue.push(process_node(root_node, i));
+
+        CitiesMatrixPrinter::print(process_node(root_node, i).matrix);
     }
 
     while (!queue.empty()) {
-        auto &cur = queue.top();
+        // consider using pointer in queue
+        auto cur = queue.top();
         queue.pop();
 
         if (cur.cities_left == 0) {
             // check if there is any more promising path
             // not needed with priority queue
             /*for (auto candidate : queue) {
-                
                 continue;
             }*/
 
@@ -95,19 +115,10 @@ TSPResult BranchnBound::solve()
         }
 
         for (int i = 0; i < matrix.get_cities_number(); i++) {
-            if (cur.matrix.at(cur.city, i) == inf)
+            if (cur.matrix.at(cur.city, i) == CitiesMatrix::unreachable_val)
                 continue;
 
-            auto masked = mask_parent_and_current(cur.matrix, cur.city, i);
-
-            auto minimize_result = minimize_matrix(matrix);
-            auto &minimized_matrix = minimize_result.second;
-            auto &cost = minimize_result.first;
-
-            Node node(matrix.get_cities_number(), i);
-            node.path = cur.path;
-            node.path.push_back(cur.city);
-            //node.total_weight
+            queue.push(process_node(cur, i));
         }
     } 
 

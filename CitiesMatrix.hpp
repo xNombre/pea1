@@ -3,15 +3,17 @@
 #include <stddef.h>
 #include <stdint.h>
 
+typedef size_t weight_t;
+
 class CitiesMatrix {
 public:
-    const int unreachable_val = SIZE_MAX;
-    
+    static const weight_t unreachable_val;
+
     CitiesMatrix(const size_t &cities_number);
     CitiesMatrix() = default;
     ~CitiesMatrix();
     CitiesMatrix(CitiesMatrix &&);
-    CitiesMatrix(CitiesMatrix &) = delete;
+    //CitiesMatrix(CitiesMatrix &) = delete;
     CitiesMatrix(const CitiesMatrix &);
     CitiesMatrix &operator=(CitiesMatrix &&);
     CitiesMatrix &operator=(const CitiesMatrix &) = delete;
@@ -21,8 +23,8 @@ public:
 
     bool is_matrix_valid() const;
 
-    const int &at(const size_t &from, const size_t &to) const;
-    int &at(const size_t &from, const size_t &to);
+    const weight_t &at(const size_t &from, const size_t &to) const;
+    weight_t &at(const size_t &from, const size_t &to);
 
     const size_t &get_cities_number() const;
 
@@ -31,5 +33,5 @@ public:
 
 private:
     size_t cities_number = 0;
-    int *matrix = nullptr;
+    weight_t *matrix = nullptr;
 };

@@ -2,17 +2,19 @@
 
 #include <stdexcept>
 
+const weight_t CitiesMatrix::unreachable_val = SIZE_MAX;
+
 CitiesMatrix::CitiesMatrix(const size_t &cities_number)
     : cities_number(cities_number)
 {
 #ifdef DEBUG
-    matrix = new int[cities_number * cities_number]();
+    matrix = new weight_t[cities_number * cities_number]();
 #else
-    matrix = new int[cities_number * cities_number];
+    matrix = new weight_t[cities_number * cities_number];
 #endif // DEBUG
     
-    for (int i = 0; i < cities_number; i++) {
-        at(i, i) = -1;
+    for (weight_t i = 0; i < cities_number; i++) {
+        at(i, i) = unreachable_val;
     }
 }
 
@@ -45,13 +47,15 @@ CitiesMatrix &CitiesMatrix::operator=(CitiesMatrix &&other)
 
 CitiesMatrix::CitiesMatrix(const CitiesMatrix &other)
 {
+    if (cities_number < 1)
+        return;
 #ifdef DEBUG
-    matrix = new int[cities_number * cities_number]();
+    matrix = new weight_t[cities_number * cities_number]();
 #else
-    matrix = new int[cities_number * cities_number];
+    matrix = new weight_t[cities_number * cities_number]();
 #endif // DEBUG
 
-    std::copy(other.matrix, other.matrix + sizeof(int) * cities_number * cities_number, matrix);
+    std::copy(other.matrix, other.matrix + cities_number * cities_number, matrix);
 
     cities_number = other.cities_number;
 }
@@ -76,8 +80,8 @@ void CitiesMatrix::connect_cities_bidirectional(const size_t &from,
 
 bool CitiesMatrix::is_matrix_valid() const
 {
-    for (int i = 0; i < cities_number; i++) {
-        for (int j = 0; j < cities_number; j++) {
+    for (size_t i = 0; i < cities_number; i++) {
+        for (size_t j = 0; j < cities_number; j++) {
             if (at(i, j) == 0)
                 return false;
             if (at(i, j) == -1 && i != j)
@@ -88,7 +92,7 @@ bool CitiesMatrix::is_matrix_valid() const
     return true;
 }
 
-const int &CitiesMatrix::at(const size_t& from, const size_t &to) const
+const weight_t &CitiesMatrix::at(const size_t &from, const size_t &to) const
 {
 #ifdef DEBUG
     if (!matrix)
@@ -101,7 +105,7 @@ const int &CitiesMatrix::at(const size_t& from, const size_t &to) const
     return matrix[from * cities_number + to];
 }
 
-int &CitiesMatrix::at(const size_t &from, const size_t &to)
+weight_t &CitiesMatrix::at(const size_t &from, const size_t &to)
 {
 #ifdef DEBUG
     if (!matrix)

@@ -18,6 +18,7 @@ void CitiesMatrixPrinter::print(const CitiesMatrix &graph)
         return;
     }
 
+    // Column headline
     std::cout << "   " << KRED;
     for (size_t j = 0; j < count; j++) {
         std::cout << j << "  ";
@@ -28,16 +29,24 @@ void CitiesMatrixPrinter::print(const CitiesMatrix &graph)
     std::cout << RST << std::endl;
 
     for (size_t i = 0; i < vertices; i++) {
+        // Row headline
         std::cout << KBLU << i << RST << " ";
-        if (i < 10)
+        if (i < 10) {
             std::cout << " ";
+        }
 
+        // Values
         for (size_t j = 0; j < count; j++) {
-            std::cout << graph.at(i, j) << " ";
+            // Show unreachable as -1
+            if (graph.at(i, j) == CitiesMatrix::unreachable_val) {
+                std::cout << "-1  ";
+                continue;
+            }
 
-            if (graph.at(i, j) < 10 && graph.at(i, j) > -1)
+            std::cout << graph.at(i, j) << " ";
+            if (graph.at(i, j) < 10)
                 std::cout << "  ";
-            else if (graph.at(i, j) > -10)
+            else if (graph.at(i, j) >= 10)
                 std::cout << " ";
         }
         std::cout << std::endl;
