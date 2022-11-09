@@ -50,12 +50,46 @@ void solve_tsp(std::unique_ptr<TSPAlgorithm> alg)
 {
     using namespace std::chrono_literals;
     TimeBench<TSPResult> benchmark([&] { return alg->solve(); });
-    auto result_fut = benchmark.start_benchmark(5min);
+    auto result_fut = benchmark.start_benchmark(2min);
     auto result = result_fut.get();
-    print_result(result.result);
-    std::cout << "Finished in " <<
-        std::chrono::duration_cast<std::chrono::milliseconds>(result.measured_time).count()
-        << "ms" << std::endl;
+    if (result.task_finished) {
+        print_result(result.result);
+        std::cout << "Finished in " <<
+            std::chrono::duration_cast<std::chrono::milliseconds>(result.measured_time).count()
+            << "ms" << std::endl;
+    }
+    else {
+        std::cout << "Timeout" << std::endl;
+    }
+}
+
+std::unique_ptr<TSPAlgorithm> choose_bnb_container(const CitiesMatrix &graph)
+{
+    std::unique_ptr<TSPAlgorithm> ptr;
+
+    char input;
+    cout << "Wybierz kontener:\n"
+        << "p - priority_queue\n"
+        << "s - stack\n"
+        << "q - queue\n";
+    input = getOptionFromUser();
+
+    switch (input) {
+    case 'p': {
+        ptr = std::make_unique<BranchnBound<std::priority_queue>>(graph);
+        break;
+    }
+    case 's': {
+        ptr = std::make_unique<BranchnBound<std::stack>>(graph);
+        break;
+    }
+    case 'q': {
+        ptr = std::make_unique<BranchnBound<std::queue>>(graph);
+        break;
+    }
+    }
+
+    return ptr;
 }
 
 void menu()
@@ -68,10 +102,10 @@ void menu()
             << "r - losowa generacja\n"
             << "x - wyswietl graf\n"
             << "b - brute-force\n"
-            << "a - branch&bound (little)\n"
+            << "a - branch&bound\n"
             << "d - dynamic\n"
             << "s - benchmark\n"
-            << "e - wyjscie\n";
+            << "q - wyjscie\n";
         input = getOptionFromUser();
 
         switch (input) {
@@ -95,14 +129,14 @@ void menu()
             break;
         }
         case 'a': {
-            solve_tsp(std::make_unique<BranchnBound>(graph));
+            solve_tsp(choose_bnb_container(graph));
             break;
         }
         case 'd': {
             solve_tsp(std::make_unique<DynamicTSP>(graph));
             break;
         }
-        case 'e': {
+        case 'q': {
             return;
         }
         case 's': {

@@ -1,10 +1,7 @@
 #include "BranchnBound.hpp"
 
-#include "Array.hpp"
-
-#include "CitiesMatrixPrinter.hpp"
-
-size_t BranchnBound::minimize_matrix(matrix_t &matrix)
+template<template <typename> typename Container>
+size_t BranchnBound<Container>::minimize_matrix(matrix_t &matrix)
 {
     std::vector<size_t> min_col(matrix.get_cities_number(), CitiesMatrix::unreachable_val);
     size_t reduce_factor = 0;
@@ -56,49 +53,8 @@ size_t BranchnBound::minimize_matrix(matrix_t &matrix)
     return reduce_factor;
 }
 
-size_t BranchnBound::minimize_rows_by(matrix_t &matrix,
-                                      const size_t factor,
-                                      std::vector<size_t> &columns_reduce)
-{
-    size_t reduce_factor = 0;
-
-    if (factor != 0 && factor != CitiesMatrix::unreachable_val) {
-        reduce_factor += factor;
-        // minimize row
-        for (size_t j = 0; j < matrix.get_cities_number(); j++) {
-            //if (matrix.at(i, j) == CitiesMatrix::unreachable_val)
-                continue;
-
-            //matrix.at(i, j) -= factor;
-
-            //columns_reduce[j] = std::min(columns_reduce[j], matrix.at(i, j));
-        }
-    }
-
-    return reduce_factor;
-}
-
-size_t BranchnBound::minimize_columns_by_array(matrix_t &matrix,
-                                               const std::vector<size_t> &columns_reduce)
-{
-    size_t reduce_factor = 0;
-
-    for (size_t i = 0; i < columns_reduce.size(); i++) {
-        if (columns_reduce[i] != 0 && columns_reduce[i] != CitiesMatrix::unreachable_val) {
-            reduce_factor += columns_reduce[i];
-            for (size_t row = 0; row < columns_reduce.size(); row++) {
-                if (matrix.at(row, i) == CitiesMatrix::unreachable_val)
-                    continue;
-
-                matrix.at(row, i) -= columns_reduce[i];
-            }
-        }
-    }
-
-    return reduce_factor;
-}
-
-void BranchnBound::mask_parent_and_current(matrix_t &matrix, size_t from, size_t to)
+template<template <typename> typename Container>
+void BranchnBound<Container>::mask_parent_and_current(matrix_t &matrix, size_t from, size_t to)
 {
     for (size_t i = 0; i < matrix.get_cities_number(); i++) {
         matrix.at(from, i) = CitiesMatrix::unreachable_val;
@@ -107,7 +63,8 @@ void BranchnBound::mask_parent_and_current(matrix_t &matrix, size_t from, size_t
     matrix.at(to, from) = CitiesMatrix::unreachable_val;
 }
 
-auto BranchnBound::process_node(Node parent, size_t to) -> Node
+template<template <typename> typename Container>
+auto BranchnBound<Container>::process_node(Node parent, size_t to) -> Node
 {
     parent.total_weight += parent.matrix.at(parent.city, to);
     mask_parent_and_current(parent.matrix, parent.city, to);
@@ -116,19 +73,19 @@ auto BranchnBound::process_node(Node parent, size_t to) -> Node
     return parent;
 }
 
-template<template<typename T> typename container>
-void BranchnBound::queue_available_nodes(container<Node> &cont,
-                                         Node &node)
+template<template <typename> typename Container>
+void BranchnBound<Container>::queue_available_nodes(const Node &node)
 {
-    for (int i = 0; i < node.matrix.get_cities_number(); i++) {
+    for (size_t i = 0; i < node.matrix.get_cities_number(); i++) {
         if (node.matrix.at(node.city, i) == CitiesMatrix::unreachable_val)
             continue;
 
-        cont.push(process_node(node, i));
+        nodes_container.push(process_node(node, i));
     }
 }
 
-auto BranchnBound::create_root_node(const CitiesMatrix &matrix) -> Node
+template<template <typename> typename Container>
+auto BranchnBound<Container>::create_root_node(const CitiesMatrix &matrix) -> Node
 {
     auto minimized_matrix = matrix;
     auto cost = minimize_matrix(minimized_matrix);
@@ -141,35 +98,73 @@ auto BranchnBound::create_root_node(const CitiesMatrix &matrix) -> Node
     return root_node;
 }
 
-template<typename Container>
-TSPResult BranchnBound::solve()
+template<template <typename> typename Container>
+template<typename T>
+typename std::enable_if<std::is_same<Container<T>, std::queue<T>>::value, T>::type
+constexpr BranchnBound<Container>::get_queue_top_node()
 {
-    TSPResult result;
-    std::priority_queue<Node> queue;
+    return nodes_container.front();
+}
+
+template<template <typename> typename Container>
+template<typename T>
+typename std::enable_if<std::is_same<Container<T>, std::stack<T>>::value, T>::type
+constexpr BranchnBound<Container>::get_queue_top_node()
+{
+    return nodes_container.top();
+}
+
+template<template <typename> typename Container>
+template<typename T>
+typename std::enable_if<std::is_same<Container<T>, std::priority_queue<T>>::value, T>::type
+constexpr BranchnBound<Container>::get_queue_top_node()
+{
+    return nodes_container.top();
+}
+
+template<template <typename> typename Container>
+TSPResult BranchnBound<Container>::solve()
+{
     const auto &matrix = *this->matrix;
-
-    auto root_node = create_root_node(matrix);
-    queue_available_nodes(queue, root_node);
-
-    while (!queue.empty()) {
-        auto cur = queue.top();
-        queue.pop();
-
-        if (cur.cities_left == 0) {
-            // check if there is any more promising path
-            // not needed with priority queue
-            /*for (auto candidate : queue) {
-                continue;
-            }*/
-
-            // return current path when theres no better path
-            result.path = cur.path;
-            result.total_weight = cur.total_weight;
-            return result;
-        }
-
-        queue_available_nodes(queue, cur);
+    TSPResult result;
+    if constexpr (!std::is_same<Container<Node>, std::priority_queue<Node>>::value) {
+        result.total_weight = SIZE_MAX;
     }
 
-    throw std::runtime_error("Something went terribly wrong");
+    queue_available_nodes(create_root_node(matrix));
+
+    while (!nodes_container.empty()) {
+        Node cur = get_queue_top_node<Node>();
+        nodes_container.pop();
+
+        if constexpr (!std::is_same<Container<Node>, std::priority_queue<Node>>::value) {
+            if (result.total_weight < cur.total_weight) {
+                continue;
+            }
+        }
+
+        if (cur.cities_left == 1) {
+            if constexpr (std::is_same<Container<Node>, std::priority_queue<Node>>::value) {
+                result.path = cur.path;
+                result.total_weight = cur.total_weight;
+                return result;
+            }
+            else {
+                if (result.total_weight > cur.total_weight) {
+                    result.path = cur.path;
+                    result.total_weight = cur.total_weight;
+                }
+                continue;
+            }
+        }
+
+            queue_available_nodes(cur);
+    }
+
+    if constexpr (std::is_same<Container<Node>, std::priority_queue<Node>>::value) {
+        throw std::runtime_error("Something went terribly wrong");
+    }
+    else {
+        return result;
+    }
 }

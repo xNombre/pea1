@@ -11,7 +11,8 @@ TimeBench<ReturnType>::TimeBench(task_function_t fun)
 template <typename ReturnType>
 TimeBench<ReturnType>::~TimeBench()
 {
-    task_thread.join();
+    if (task_thread.joinable())
+        task_thread.join();
     watchdog_thread.join();
 }
 
@@ -24,7 +25,12 @@ auto TimeBench<ReturnType>::start_benchmark(const timeout_t &timeout) -> std::fu
 
     auto future = task_promise.get_future();
 
-    task_thread = std::thread([&] {benchmark_function();});
+    task_thread = std::thread([&] {
+        int *old;
+        // Change cancel type to be able to kill the thread immediately
+        pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, old);
+        benchmark_function();
+                              });
     native_handle = task_thread.native_handle();
     watchdog_thread = std::thread([&](const timeout_t &timeout) {
         watchdog_function(timeout);
@@ -59,6 +65,7 @@ void TimeBench<ReturnType>::watchdog_function(const timeout_t &timeout)
     auto status = watchdog_timeout.wait_until(lock, std::chrono::system_clock::now() + timeout);
 
     if (status == std::cv_status::timeout) {
+        task_thread.detach();
         pthread_cancel(native_handle);
 
         task_result.task_finished = false;
