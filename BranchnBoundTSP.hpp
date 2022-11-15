@@ -8,15 +8,15 @@
 #include "TSPAlgorithm.hpp"
 
 template<template <typename Type> typename Container>
-class BranchnBound : public TSPAlgorithm {
+class BranchnBoundTSP : public TSPAlgorithm {
 public:
-    BranchnBound(const CitiesMatrix &matrix)
+    BranchnBoundTSP(const CitiesMatrix &matrix)
         : TSPAlgorithm(matrix)
     { }
 
     TSPResult solve() override;
 
-    ~BranchnBound() = default;
+    ~BranchnBoundTSP() = default;
 
 private:
     typedef CitiesMatrix matrix_t;
@@ -62,6 +62,6 @@ private:
     };
 };
 
-template class BranchnBound<std::priority_queue>;
-template class BranchnBound<std::stack>;
-template class BranchnBound<std::queue>;
+template class BranchnBoundTSP<std::priority_queue>;
+template class BranchnBoundTSP<std::stack>;
+template class BranchnBoundTSP<std::queue>;

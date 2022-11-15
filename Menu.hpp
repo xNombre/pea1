@@ -7,7 +7,7 @@
 #include "CitiesMatrixPrinter.hpp"
 #include "BruteForceTSP.hpp"
 #include "ArrayPrinter.hpp"
-#include "BranchnBound.hpp"
+#include "BranchnBoundTSP.hpp"
 #include "RandomGraphGen.hpp"
 #include "DynamicTSP.hpp"
 #include "TimeBench.hpp"
@@ -78,15 +78,15 @@ std::unique_ptr<TSPAlgorithm> choose_bnb_container(const CitiesMatrix &graph)
 
     switch (input) {
     case 'p': {
-        ptr = std::make_unique<BranchnBound<std::priority_queue>>(graph);
+        ptr = std::make_unique<BranchnBoundTSP<std::priority_queue>>(graph);
         break;
     }
     case 's': {
-        ptr = std::make_unique<BranchnBound<std::stack>>(graph);
+        ptr = std::make_unique<BranchnBoundTSP<std::stack>>(graph);
         break;
     }
     case 'q': {
-        ptr = std::make_unique<BranchnBound<std::queue>>(graph);
+        ptr = std::make_unique<BranchnBoundTSP<std::queue>>(graph);
         break;
     }
     }

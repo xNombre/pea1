@@ -6,7 +6,7 @@
 #include <vector>
 
 #include "DynamicTSP.hpp"
-#include "BranchnBound.hpp"
+#include "BranchnBoundTSP.hpp"
 #include "TimeBench.hpp"
 #include "RandomGraphGen.hpp"
 #include "BruteForceTSP.hpp"
@@ -47,13 +47,13 @@ std::string Benchmark::get_name_of_algorithm(std::type_index alg)
     else if (alg == typeid(DynamicTSP)) {
         return "Dynamic";
     }
-    else if (alg == typeid(BranchnBound<std::queue>)) {
+    else if (alg == typeid(BranchnBoundTSP<std::queue>)) {
         return "BnB queue";
     }
-    else if (alg == typeid(BranchnBound<std::stack>)) {
+    else if (alg == typeid(BranchnBoundTSP<std::stack>)) {
         return "BnB stack";
     }
-    else if (alg == typeid(BranchnBound<std::priority_queue>)) {
+    else if (alg == typeid(BranchnBoundTSP<std::priority_queue>)) {
         return "BnB priority_queue";
     }
 
@@ -73,13 +73,13 @@ void Benchmark::start_benchmark()
             std::unordered_map<std::type_index, std::shared_ptr<TSPAlgorithm>> algorithms = {
                 //{typeid(BruteForceTSP), std::make_shared<BruteForceTSP>(matrix)},
                 {typeid(DynamicTSP), std::make_shared<DynamicTSP>(matrix)},
-                {typeid(BranchnBound<std::queue>), std::make_shared<BranchnBound<std::queue>>(matrix)},
-                {typeid(BranchnBound<std::stack>), std::make_shared<BranchnBound<std::stack>>(matrix)},
-                {typeid(BranchnBound<std::priority_queue>), std::make_shared<BranchnBound<std::priority_queue>>(matrix)}
+                {typeid(BranchnBoundTSP<std::queue>), std::make_shared<BranchnBoundTSP<std::queue>>(matrix)},
+                {typeid(BranchnBoundTSP<std::stack>), std::make_shared<BranchnBoundTSP<std::stack>>(matrix)},
+                {typeid(BranchnBoundTSP<std::priority_queue>), std::make_shared<BranchnBoundTSP<std::priority_queue>>(matrix)}
             };
 
             for (auto &alg : algorithms) {
-                std::type_index type = typeid(BranchnBound<std::queue>);
+                std::type_index type = typeid(BranchnBoundTSP<std::queue>);
                 if (alg.first == type && size > 11)
                     continue;
                 

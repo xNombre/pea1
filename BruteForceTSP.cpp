@@ -14,7 +14,7 @@ TSPResult BruteForceTSP::solve()
         size_t cur_weight;
     
         cur_weight = matrix.at(0, perm[0]);
-        for (size_t i = 1, j = 0; i < matrix.get_cities_number() - 1; i++, j++) {
+        for (size_t i = 1, j = 0; i < matrix.get_cities_number() - 1 && cur_weight < result.total_weight; i++, j++) {
             cur_weight += matrix.at(perm[j], perm[i]);
         }
         cur_weight += matrix.at(perm[matrix.get_cities_number() - 2], 0);

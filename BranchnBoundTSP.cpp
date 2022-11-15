@@ -1,7 +1,7 @@
-#include "BranchnBound.hpp"
+#include "BranchnBoundTSP.hpp"
 
 template<template <typename> typename Container>
-size_t BranchnBound<Container>::minimize_matrix(matrix_t &matrix)
+size_t BranchnBoundTSP<Container>::minimize_matrix(matrix_t &matrix)
 {
     std::vector<size_t> min_col(matrix.get_cities_number(), CitiesMatrix::unreachable_val);
     size_t reduce_factor = 0;
@@ -54,7 +54,7 @@ size_t BranchnBound<Container>::minimize_matrix(matrix_t &matrix)
 }
 
 template<template <typename> typename Container>
-void BranchnBound<Container>::mask_parent_and_current(matrix_t &matrix, size_t from, size_t to)
+void BranchnBoundTSP<Container>::mask_parent_and_current(matrix_t &matrix, size_t from, size_t to)
 {
     for (size_t i = 0; i < matrix.get_cities_number(); i++) {
         matrix.at(from, i) = CitiesMatrix::unreachable_val;
@@ -64,7 +64,7 @@ void BranchnBound<Container>::mask_parent_and_current(matrix_t &matrix, size_t f
 }
 
 template<template <typename> typename Container>
-auto BranchnBound<Container>::process_node(Node parent, size_t to) -> Node
+auto BranchnBoundTSP<Container>::process_node(Node parent, size_t to) -> Node
 {
     parent.total_weight += parent.matrix.at(parent.city, to);
     mask_parent_and_current(parent.matrix, parent.city, to);
@@ -74,7 +74,7 @@ auto BranchnBound<Container>::process_node(Node parent, size_t to) -> Node
 }
 
 template<template <typename> typename Container>
-void BranchnBound<Container>::queue_available_nodes(const Node &node)
+void BranchnBoundTSP<Container>::queue_available_nodes(const Node &node)
 {
     for (size_t i = 0; i < node.matrix.get_cities_number(); i++) {
         if (node.matrix.at(node.city, i) == CitiesMatrix::unreachable_val)
@@ -85,7 +85,7 @@ void BranchnBound<Container>::queue_available_nodes(const Node &node)
 }
 
 template<template <typename> typename Container>
-auto BranchnBound<Container>::create_root_node(const CitiesMatrix &matrix) -> Node
+auto BranchnBoundTSP<Container>::create_root_node(const CitiesMatrix &matrix) -> Node
 {
     auto minimized_matrix = matrix;
     auto cost = minimize_matrix(minimized_matrix);
@@ -99,7 +99,7 @@ auto BranchnBound<Container>::create_root_node(const CitiesMatrix &matrix) -> No
 }
 
 template<template <typename> typename Container>
-TSPResult BranchnBound<Container>::solve()
+TSPResult BranchnBoundTSP<Container>::solve()
 {
     const auto &matrix = *this->matrix;
     TSPResult result;
@@ -120,11 +120,11 @@ TSPResult BranchnBound<Container>::solve()
         }();
         nodes_container.pop();
 
-        if constexpr (!std::is_same<Container<Node>, std::priority_queue<Node>>::value) {
+        //if constexpr (!std::is_same<Container<Node>, std::priority_queue<Node>>::value) {
             if (result.total_weight < cur.total_weight) {
                 continue;
             }
-        }
+        //}
 
         if (cur.cities_left == 1) {
             if constexpr (std::is_same<Container<Node>, std::priority_queue<Node>>::value) {
