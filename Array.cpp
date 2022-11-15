@@ -7,20 +7,16 @@
 using std::size_t;
 
 template <typename T>
-void Array<T>::clear()
-{
-    if (array_size == 0)
-        return;
-    std::fill(array, array + array_size, 0);
-}
-
-template <typename T>
 Array<T>::Array(const size_t &size) : array_size(size)
 {
     if (size == 0)
         return;
 
+#ifdef DEBUG
     array = new T[size]();
+#else
+    array = new T[size];
+#endif // DEBUG
 }
 
 template <typename T>
@@ -48,9 +44,31 @@ Array<T>::Array(const Array<T> &other)
 template <typename T>
 auto Array<T>::operator=(const Array<T> &other) -> Array<T> &
 {
+    if (this == &other)
+        return *this;
+
+    delete[] array;
+    
     array_size = other.array_size;
     array = new T[array_size];
     std::copy(other.array, other.array + array_size, array);
+    return *this;
+}
+
+template <typename T>
+auto Array<T>::operator=(Array &&other) -> Array<T> &
+{
+    if (this == &other)
+        return *this;
+
+    delete[] array;
+    
+    array_size = other.array_size;
+    array = other.array;
+
+    other.array = nullptr;
+    other.array_size = 0;
+
     return *this;
 }
 
@@ -63,17 +81,29 @@ Array<T>::~Array()
 template <typename T>
 T &Array<T>::operator[](const size_t &at)
 {
+#ifdef DEBUG
     if (at >= array_size)
         throw std::out_of_range("Array index out of range");
+#endif //DEBUG
     return array[at];
 }
 
 template <typename T>
 const T &Array<T>::operator[](const size_t &at) const
 {
+#ifdef DEBUG
     if (at >= array_size)
         throw std::out_of_range("Array index out of range");
+#endif //DEBUG
     return array[at];
+}
+
+template <typename T>
+void Array<T>::clear()
+{
+    if (array_size == 0)
+        return;
+    std::fill(array, array + array_size, 0);
 }
 
 template <typename T>
@@ -84,7 +114,11 @@ void Array<T>::resize(const size_t &size)
         array = nullptr;
     }
     else {
+#ifdef DEBUG
         T *new_array = new T[size]();
+#else
+        T *new_array = new T[size];
+#endif // DEBUG
 
         std::copy(array, array + std::min(array_size, size), new_array);
 
@@ -198,15 +232,6 @@ bool Array<T>::remove(const T &val)
     array_size = new_size;
 
     return true;
-}
-
-template <typename T>
-void Array<T>::print() const
-{
-    for (size_t i = 0; i < array_size; i++) {
-        std::cout << array[i] << " ";
-    }
-    std::cout << std::endl;
 }
 
 template <typename T>
