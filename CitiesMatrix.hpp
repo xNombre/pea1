@@ -33,5 +33,5 @@ public:
 
 private:
     size_t cities_number = 0;
-    weight_t *matrix = nullptr;
+    weight_t **matrix = nullptr;
 };

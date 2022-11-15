@@ -10,7 +10,10 @@ CitiesMatrix::CitiesMatrix(const size_t &cities_number)
 #ifdef DEBUG
     matrix = new weight_t[cities_number * cities_number]();
 #else
-    matrix = new weight_t[cities_number * cities_number];
+    matrix = new weight_t*[cities_number];
+    for (size_t i = 0; i < cities_number; i++) {
+        matrix[i] = new weight_t[cities_number];
+    }
 #endif // DEBUG
     
     for (weight_t i = 0; i < cities_number; i++) {
@@ -20,6 +23,9 @@ CitiesMatrix::CitiesMatrix(const size_t &cities_number)
 
 CitiesMatrix::~CitiesMatrix()
 {
+    for (size_t i = 0; i < cities_number; i++) {
+        delete[] matrix[i];
+    }
     delete[] matrix;
 }
 
@@ -37,6 +43,9 @@ CitiesMatrix &CitiesMatrix::operator=(CitiesMatrix &&other)
     if (this == &other)
         return *this;
 
+    for (size_t i = 0; i < cities_number; i++) {
+        delete[] matrix[i];
+    }
     delete[] matrix;
     
     cities_number = other.cities_number;
@@ -55,10 +64,15 @@ CitiesMatrix::CitiesMatrix(const CitiesMatrix &other)
 #ifdef DEBUG
     matrix = new weight_t[cities_number * cities_number]();
 #else
-    matrix = new weight_t[cities_number * cities_number];
+    matrix = new weight_t * [cities_number];
+    for (size_t i = 0; i < cities_number; i++) {
+        matrix[i] = new weight_t[cities_number];
+    }
 #endif // DEBUG
 
-    std::copy(other.matrix, other.matrix + cities_number * cities_number, matrix);
+    for (size_t i = 0; i < cities_number; i++) {
+        std::copy(other.matrix[i], other.matrix[i] + cities_number, matrix[i]);
+    }
 }
 
 void CitiesMatrix::connect_cities(const size_t &from, const size_t &to, const size_t &weight)
@@ -103,7 +117,7 @@ const weight_t &CitiesMatrix::at(const size_t &from, const size_t &to) const
         throw std::out_of_range("");
 #endif // DEBUG
 
-    return matrix[from * cities_number + to];
+    return matrix[from][to];
 }
 
 weight_t &CitiesMatrix::at(const size_t &from, const size_t &to)
@@ -116,7 +130,7 @@ weight_t &CitiesMatrix::at(const size_t &from, const size_t &to)
         throw std::out_of_range("");
 #endif // DEBUG
 
-    return matrix[from * cities_number + to];
+    return matrix[from][to];
 }
 
 const size_t &CitiesMatrix::get_cities_number() const
