@@ -7,7 +7,7 @@
 class ArrayPrinter {
 public:
     template <typename T>
-    static void print(const Array<T> &array)
+    static void print(const Array<T> &array, bool insert_newline = true)
     {
         if (array.empty())
             return;
@@ -15,6 +15,7 @@ public:
         for (size_t i = 0; i < array.size(); i++) {
             std::cout << array[i] << " ";
         }
-        std::cout << std::endl;
+        if (insert_newline)
+            std::cout << std::endl;
     }
 };

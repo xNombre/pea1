@@ -1,7 +1,7 @@
 #include "TimeBench.hpp"
 
 #include <pthread.h>
-
+#include <iostream>
 template <typename ReturnType>
 TimeBench<ReturnType>::TimeBench(task_function_t fun)
     : task_function(fun)
@@ -25,16 +25,17 @@ auto TimeBench<ReturnType>::start_benchmark(const timeout_t &timeout) -> std::fu
 
     auto future = task_promise.get_future();
 
-    task_thread = std::thread([&] {
-        int *old;
-        // Change cancel type to be able to kill the thread immediately
-        pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, old);
-        benchmark_function();
-                              });
-    native_handle = task_thread.native_handle();
+    std::unique_lock lock(task_result_mutex);
     watchdog_thread = std::thread([&](const timeout_t &timeout) {
         watchdog_function(timeout);
                                   }, timeout);
+    task_thread = std::thread([&] {
+        int old;
+        // Change cancel type to be able to kill the thread immediately
+        pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, &old);
+        benchmark_function();
+                              });
+    native_handle = task_thread.native_handle();
 
     return std::move(future);
 }
@@ -62,6 +63,10 @@ void TimeBench<ReturnType>::watchdog_function(const timeout_t &timeout)
 {
     std::unique_lock lock(task_result_mutex);
     // Use wait_until to avoid spurious wakeups
+    if (task_result.task_finished) {
+        task_promise.set_value(std::move(task_result));
+        return;
+    }
     auto status = watchdog_timeout.wait_until(lock, std::chrono::system_clock::now() + timeout);
 
     if (status == std::cv_status::timeout) {

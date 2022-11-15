@@ -99,30 +99,6 @@ auto BranchnBound<Container>::create_root_node(const CitiesMatrix &matrix) -> No
 }
 
 template<template <typename> typename Container>
-template<typename T>
-typename std::enable_if<std::is_same<Container<T>, std::queue<T>>::value, T>::type
-constexpr BranchnBound<Container>::get_queue_top_node()
-{
-    return nodes_container.front();
-}
-
-template<template <typename> typename Container>
-template<typename T>
-typename std::enable_if<std::is_same<Container<T>, std::stack<T>>::value, T>::type
-constexpr BranchnBound<Container>::get_queue_top_node()
-{
-    return nodes_container.top();
-}
-
-template<template <typename> typename Container>
-template<typename T>
-typename std::enable_if<std::is_same<Container<T>, std::priority_queue<T>>::value, T>::type
-constexpr BranchnBound<Container>::get_queue_top_node()
-{
-    return nodes_container.top();
-}
-
-template<template <typename> typename Container>
 TSPResult BranchnBound<Container>::solve()
 {
     const auto &matrix = *this->matrix;
@@ -134,7 +110,14 @@ TSPResult BranchnBound<Container>::solve()
     queue_available_nodes(create_root_node(matrix));
 
     while (!nodes_container.empty()) {
-        Node cur = get_queue_top_node<Node>();
+        Node cur = [&] {
+            if constexpr (!std::is_same<Container<Node>, std::queue<Node>>::value) {
+                return nodes_container.top();
+            }
+            else {
+                return nodes_container.front();
+            }
+        }();
         nodes_container.pop();
 
         if constexpr (!std::is_same<Container<Node>, std::priority_queue<Node>>::value) {

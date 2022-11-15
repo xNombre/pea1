@@ -16,7 +16,7 @@ CitiesMatrix RandomGraphGen::generate(const size_t &cities, const size_t &max_we
             if (i == j)
                 continue;
             
-            matrix.connect_cities_bidirectional(i, j, randomNumberWithinRange(1, max_weight));
+            matrix.connect_cities_bidirectional(i, j, randomNumberWithinRange(10, max_weight));
         }
     }
 

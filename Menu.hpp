@@ -12,6 +12,7 @@
 #include "DynamicTSP.hpp"
 #include "TimeBench.hpp"
 #include "TimeBench.cpp"
+#include "Benchmark.hpp"
 
 using namespace std;
 
@@ -42,8 +43,9 @@ char getOptionFromUser()
 
 void print_result(const TSPResult& result)
 {
-    std::cout << result.total_weight << std::endl;
-    ArrayPrinter::print(result.path);
+    std::cout << "Calkowity koszt: " << result.total_weight << "\n0 ";
+    ArrayPrinter::print(result.path, false);
+    std::cout << "0" << std::endl;
 }
 
 void solve_tsp(std::unique_ptr<TSPAlgorithm> alg)
@@ -140,6 +142,8 @@ void menu()
             return;
         }
         case 's': {
+            Benchmark bench;
+            bench.start_benchmark();
             break;
         }
         }
