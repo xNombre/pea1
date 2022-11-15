@@ -19,7 +19,7 @@ namespace Constants
     using namespace std::chrono_literals;
 
     static const size_t random_intances_per_size = 100;
-    static const std::vector<size_t> sizes_to_test = {15, 17, 19}; //{ 3, 5, 7, 9, 10, 11, 12, 13 };
+    static const std::vector<size_t> sizes_to_test = { 3, 5, 7, 9, 10, 11, 12, 13 };
     
     static const duration_t timeout_time = 5min;
     static const size_t max_city_weight = 1000;
@@ -71,7 +71,7 @@ void Benchmark::start_benchmark()
             const auto &matrix = RandomGraphGen::generate(size, Constants::max_city_weight);
 
             std::unordered_map<std::type_index, std::shared_ptr<TSPAlgorithm>> algorithms = {
-                //{typeid(BruteForceTSP), std::make_shared<BruteForceTSP>(matrix)},
+                {typeid(BruteForceTSP), std::make_shared<BruteForceTSP>(matrix)},
                 {typeid(DynamicTSP), std::make_shared<DynamicTSP>(matrix)},
                 {typeid(BranchnBoundTSP<std::queue>), std::make_shared<BranchnBoundTSP<std::queue>>(matrix)},
                 {typeid(BranchnBoundTSP<std::stack>), std::make_shared<BranchnBoundTSP<std::stack>>(matrix)},

@@ -101,7 +101,6 @@ auto BranchnBoundTSP<Container>::create_root_node(const CitiesMatrix &matrix) ->
 template<template <typename> typename Container>
 TSPResult BranchnBoundTSP<Container>::solve()
 {
-    const auto &matrix = *this->matrix;
     TSPResult result;
     if constexpr (!std::is_same<Container<Node>, std::priority_queue<Node>>::value) {
         result.total_weight = SIZE_MAX;
@@ -120,11 +119,11 @@ TSPResult BranchnBoundTSP<Container>::solve()
         }();
         nodes_container.pop();
 
-        //if constexpr (!std::is_same<Container<Node>, std::priority_queue<Node>>::value) {
+        if constexpr (!std::is_same<Container<Node>, std::priority_queue<Node>>::value) {
             if (result.total_weight < cur.total_weight) {
                 continue;
             }
-        //}
+        }
 
         if (cur.cities_left == 1) {
             if constexpr (std::is_same<Container<Node>, std::priority_queue<Node>>::value) {

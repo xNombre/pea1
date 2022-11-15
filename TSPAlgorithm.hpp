@@ -11,17 +11,16 @@ struct TSPResult {
 class TSPAlgorithm {
 public:
     TSPAlgorithm(const CitiesMatrix &matrix)
+        : matrix(matrix)
     {
         if (!matrix.is_matrix_valid()) {
             throw std::invalid_argument("Matrix is not valid!");
         }
-
-        this->matrix = &matrix;
     }
 
     virtual TSPResult solve() = 0;
     virtual ~TSPAlgorithm() = default;
 
 protected:
-    CitiesMatrix const *matrix;
+    CitiesMatrix const& matrix;
 };
