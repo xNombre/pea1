@@ -22,7 +22,7 @@ void DynamicTSP::gen_path(mask_t mask, size_t pos)
     size_t city, cost = SIZE_MAX;
     for (size_t i = 0; i < matrix.get_cities_number(); i++) {
         mask_t cur_mask = (1 << i);
-        if ((mask & cur_mask) == 1) {
+        if ((mask & cur_mask) != 0) {
             continue;
         }
 
@@ -51,7 +51,7 @@ size_t DynamicTSP::recurse(mask_t mask, size_t pos)
 
     for (size_t i = 0; i < matrix.get_cities_number(); i++) {
         mask_t cur_mask = (1 << i);
-        if ((mask & cur_mask) == 1) {
+        if ((mask & cur_mask) != 0) {
             continue;
         }
 
